@@ -48,7 +48,7 @@ public class PlacePresenterImpl extends BasePresenter<PlaceViewInteractor> imple
      */
     @Override
     public void getPlaces(String location, String type, String radius) {
-        Observable<ResponseBody> observable = service.getNearBy(location, radius, type, Config.GOOGLE_API_KEY);
+        Observable<ResponseBody> observable = service.getNearBy(location, radius, type,"distance", Config.GOOGLE_API_KEY);
         getViewInteractor().showProgress();
 
         new CompositeDisposable().add(observable

@@ -2,6 +2,7 @@ package com.android.aaditya.zumperapp.module.map;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -33,11 +34,14 @@ import java.util.List;
 import butterknife.BindView;
 import timber.log.Timber;
 
-public class MapActivity extends BaseActivity implements PlaceViewInteractor, OnMapReadyCallback {
+public class MapActivity extends BaseActivity implements PlaceViewInteractor,GoogleMap.OnCameraMoveStartedListener,
+        GoogleMap.OnCameraIdleListener, OnMapReadyCallback {
 
     private PlacePresenter presenter;
     private GoogleMap googleMap;
-
+    private double cameraLat;
+    private double cameraLng;
+    private boolean isMoving;
     @BindView(R.id.progress)
     ProgressBar progressBar;
 
@@ -49,7 +53,9 @@ public class MapActivity extends BaseActivity implements PlaceViewInteractor, On
         presenter = new PlacePresenterImpl();
         presenter.attachViewInteractor(this);
 
-        presenter.getPlaces("37.77,-122.42","restaurant","5000");
+        cameraLat = 37.77;
+        cameraLng =-122.42;
+        presenter.getPlaces("37.77,-122.42","restaurant","500");
 
         initializeMap();
     }
@@ -97,8 +103,12 @@ public class MapActivity extends BaseActivity implements PlaceViewInteractor, On
 
 
         LatLng currentLocation = new LatLng(37.77,-122.42);
-        CameraPosition cameraPosition = new CameraPosition.Builder().target(currentLocation).zoom(14).tilt(90).build();
+        CameraPosition cameraPosition = new CameraPosition.Builder().target(currentLocation).zoom(15).tilt(90).build();
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+
+        googleMap.setOnCameraMoveStartedListener(this);
+        googleMap.setOnCameraIdleListener(this);
     }
 
     /**
@@ -106,6 +116,7 @@ public class MapActivity extends BaseActivity implements PlaceViewInteractor, On
      * @param places
      */
     private void addMarker(List<Place> places) {
+        googleMap.clear();
         for (final Place place : places) {
             double latitude = Double.parseDouble(place.getLat());
             double longitude = Double.parseDouble(place.getLng());
@@ -151,5 +162,40 @@ public class MapActivity extends BaseActivity implements PlaceViewInteractor, On
         view.setDrawingCacheEnabled(true);
         view.buildDrawingCache();
         return view.getDrawingCache();
+    }
+
+    @Override
+    public void onCameraIdle() {
+        if (!isMoving)
+            return;
+
+        isMoving = false;
+
+        Location start = new Location("start");
+        start.setLatitude(cameraLat);
+        start.setLongitude(cameraLng);
+
+        Location end = new Location("end");
+        end.setLatitude(googleMap.getCameraPosition().target.latitude);
+        end.setLongitude(googleMap.getCameraPosition().target.longitude);
+
+        float distance = start.distanceTo(end);
+
+        // If distance less than 700 metres don't call api.
+        if (distance < 700)
+            return;
+
+        cameraLat = end.getLatitude();
+        cameraLng = end.getLongitude();
+
+        presenter.getPlaces(String.valueOf(cameraLat + "," + cameraLng),"restaurant","500");
+
+    }
+
+    @Override
+    public void onCameraMoveStarted(int i) {
+        Timber.d("started");
+        // Flag for camera moved.
+        isMoving = true;
     }
 }
