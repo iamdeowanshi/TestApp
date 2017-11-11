@@ -124,6 +124,7 @@ public class MapActivity extends BaseActivity implements PlaceViewInteractor,Goo
             Marker marker = googleMap.addMarker(new MarkerOptions()
                     .position(new LatLng(latitude, longitude))
                     .title(place.getName())
+                    .anchor(0,0.49f)
                     .snippet(place.getAddress())
                     .icon(BitmapDescriptorFactory.fromBitmap(getBitmapIcon(place))));
             marker.setTag(place);
