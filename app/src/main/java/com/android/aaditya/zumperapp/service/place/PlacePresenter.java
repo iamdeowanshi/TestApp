@@ -1,7 +1,7 @@
-package com.android.aaditya.zumperapp;
+package com.android.aaditya.zumperapp.service.place;
 
-import com.android.aaditya.zumperapp.base.BasePresenter;
 import com.android.aaditya.zumperapp.base.Presenter;
+import com.android.aaditya.zumperapp.model.Place;
 
 /**
  * Created by aaditya on 11/10/17.
@@ -10,6 +10,6 @@ import com.android.aaditya.zumperapp.base.Presenter;
 public interface PlacePresenter extends Presenter<PlaceViewInteractor> {
 
     void getPlaces(String location, String type, String radius);
-    void getDetails(String placeId);
+    void getDetails(Place place);
 
 }

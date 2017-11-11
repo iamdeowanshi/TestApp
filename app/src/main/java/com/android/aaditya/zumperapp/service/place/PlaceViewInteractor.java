@@ -1,4 +1,4 @@
-package com.android.aaditya.zumperapp;
+package com.android.aaditya.zumperapp.service.place;
 
 import com.android.aaditya.zumperapp.base.ViewInteractor;
 import com.android.aaditya.zumperapp.model.Place;

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".module.map.MapActivity">
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        class="com.google.android.gms.maps.SupportMapFragment" />
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        android:id="@+id/progress"/>
+
+    <FrameLayout
+        android:id="@+id/framelayout"
+        android:orientation="horizontal"
+        android:visibility="invisible"
+        android:layout_centerHorizontal="true"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp">
+
+            <ImageView
+                android:id="@+id/ImageView01"
+                android:src="@drawable/drawable_marker"
+                android:layout_height="35dp"
+                android:layout_marginLeft="100dp"
+                android:layout_width="23dp"/>
+
+            <TextView android:id="@+id/text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:text="Koi bada sa naam "
+                android:textColor="#000"
+                android:paddingLeft="10dp"
+                android:textSize="12sp"
+                android:layout_gravity="center"/>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</RelativeLayout>

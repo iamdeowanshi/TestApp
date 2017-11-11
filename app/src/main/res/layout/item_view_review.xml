@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/author_image"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/author_image"
+        android:text="Sam Behnam"
+        android:textStyle="bold"
+        android:padding="5dp"
+        android:id="@+id/author_name"
+        android:textSize="15sp"/>
+
+    <RatingBar
+        android:id="@+id/rating_bar"
+        style="@style/Widget.AppCompat.RatingBar.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:layout_below="@+id/author_name"
+        android:rating="4.5"
+        android:layout_alignStart="@+id/author_name"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="5 days ago"
+        android:id="@+id/time"
+        android:layout_toRightOf="@id/rating_bar"
+        android:layout_alignBottom="@+id/rating_bar"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/description"
+        android:layout_alignStart="@+id/rating_bar"
+        android:layout_below="@id/rating_bar"
+        android:text="Room was nice and clean. The staff is great. The beds are soft to me but I prefer firm mattresses. The hotel is close to shopping and popular restaurants which is nice. I enjoyed my stay."/>
+
+</RelativeLayout>

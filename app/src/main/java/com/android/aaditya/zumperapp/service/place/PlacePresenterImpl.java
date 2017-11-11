@@ -1,15 +1,20 @@
-package com.android.aaditya.zumperapp;
+package com.android.aaditya.zumperapp.service.place;
 
+import com.android.aaditya.zumperapp.Config;
 import com.android.aaditya.zumperapp.base.BasePresenter;
 import com.android.aaditya.zumperapp.model.Place;
+import com.android.aaditya.zumperapp.model.Review;
 import com.android.aaditya.zumperapp.service.ApiModule;
 import com.android.aaditya.zumperapp.service.GoogleService;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,14 +34,21 @@ public class PlacePresenterImpl extends BasePresenter<PlaceViewInteractor> imple
 
     private GoogleService service;
     private JsonObject responseNearBy;
+    private JsonObject responseDetail;
 
     public PlacePresenterImpl() {
         service = ApiModule.getInstance().getGoogleService();
     }
 
+    /**
+     * Fetching list of nearby by search.
+     * @param location
+     * @param type
+     * @param radius
+     */
     @Override
     public void getPlaces(String location, String type, String radius) {
-        Observable<ResponseBody> observable = service.getNearBy(location, radius, type,Config.GOOGLE_API_KEY);
+        Observable<ResponseBody> observable = service.getNearBy(location, radius, type, Config.GOOGLE_API_KEY);
         getViewInteractor().showProgress();
 
         new CompositeDisposable().add(observable
@@ -86,10 +98,14 @@ public class PlacePresenterImpl extends BasePresenter<PlaceViewInteractor> imple
                             }));
     }
 
+    /**
+     * Fetching details for a place using placeId.
+     * @param place
+     */
     @Override
-    public void getDetails(String placeId) {
+    public void getDetails(final Place place) {
 
-        Observable<ResponseBody> observable = service.getDetails(placeId,Config.GOOGLE_API_KEY);
+        Observable<ResponseBody> observable = service.getDetails(place.getPlaceid(),Config.GOOGLE_API_KEY);
 
         new CompositeDisposable().add(observable
                 .subscribeOn(Schedulers.io())
@@ -97,12 +113,37 @@ public class PlacePresenterImpl extends BasePresenter<PlaceViewInteractor> imple
                 .subscribeWith(new DisposableObserver<ResponseBody>() {
                     @Override
                     public void onNext(@NonNull ResponseBody responseBody) {
+                        try {
+                            responseDetail = (JsonObject) new JsonParser().parse(String.valueOf((responseBody).string()));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        JsonObject result = responseDetail.getAsJsonObject("result");
+                        place.setAddress(result.get("formatted_address").getAsString());
+                        place.setNumber(result.get("international_phone_number").getAsString());
+                        place.setRating(result.get("rating").getAsFloat());
+
+                        Type listType = new TypeToken<List<Review>>() {
+                        }.getType();
+                        List<Review> reviews = new Gson().fromJson(result.get("reviews").toString(), listType);
+                        place.setReviews(reviews);
+
+                        JsonArray photos = (JsonArray) result.get("photos");
+                        List<String> images = new ArrayList<>();
+                        for (JsonElement element: photos)
+                            images.add(element.getAsJsonObject().get("photo_reference").getAsString());
+
+                        place.setPhotos(images);
+                        getViewInteractor().hideProgress();
+                        getViewInteractor().onDetails(place);
 
                     }
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-
+                        getViewInteractor().hideProgress();
+                        e.printStackTrace();
                     }
 
                     @Override

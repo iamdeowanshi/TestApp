@@ -12,7 +12,7 @@ public class Place {
     private String address;
     private String placeid;
     private List<String> photos;
-    private int rating;
+    private float rating;
     private List<Review> reviews;
     private String number;
     private String lat;
@@ -51,11 +51,11 @@ public class Place {
         this.photos = photos;
     }
 
-    public int getRating() {
+    public float getRating() {
         return rating;
     }
 
-    public void setRating(int rating) {
+    public void setRating(float rating) {
         this.rating = rating;
     }
 

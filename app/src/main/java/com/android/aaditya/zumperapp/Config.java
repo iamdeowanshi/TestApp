@@ -2,11 +2,8 @@ package com.android.aaditya.zumperapp;
 
 import android.content.pm.ActivityInfo;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 
 public class Config {
