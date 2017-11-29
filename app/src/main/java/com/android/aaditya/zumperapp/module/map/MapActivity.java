@@ -6,13 +6,16 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.android.aaditya.zumperapp.ListActivity;
 import com.android.aaditya.zumperapp.R;
 import com.android.aaditya.zumperapp.base.BaseActivity;
 import com.android.aaditya.zumperapp.model.Place;
+import com.android.aaditya.zumperapp.model.Review;
 import com.android.aaditya.zumperapp.module.details.DetailActivity;
 import com.android.aaditya.zumperapp.service.place.PlacePresenter;
 import com.android.aaditya.zumperapp.service.place.PlacePresenterImpl;
@@ -28,15 +31,20 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import timber.log.Timber;
 
-public class MapActivity extends BaseActivity implements PlaceViewInteractor,GoogleMap.OnCameraMoveStartedListener,
+public class MapActivity extends BaseActivity implements PlaceViewInteractor, GoogleMap.OnCameraMoveStartedListener,
         GoogleMap.OnCameraIdleListener, OnMapReadyCallback {
 
+    @BindView(R.id.list) Button list;
     private PlacePresenter presenter;
     private GoogleMap googleMap;
     private double cameraLat;
@@ -44,18 +52,19 @@ public class MapActivity extends BaseActivity implements PlaceViewInteractor,Goo
     private boolean isMoving;
     @BindView(R.id.progress)
     ProgressBar progressBar;
-
+    private List<Place> places;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+        ButterKnife.bind(this);
 
         presenter = new PlacePresenterImpl();
         presenter.attachViewInteractor(this);
 
         cameraLat = 37.77;
-        cameraLng =-122.42;
-        presenter.getPlaces("37.77,-122.42","restaurant","500");
+        cameraLng = -122.42;
+        presenter.getPlaces("37.77,-122.42", "restaurant", "500");
 
         initializeMap();
     }
@@ -79,6 +88,7 @@ public class MapActivity extends BaseActivity implements PlaceViewInteractor,Goo
     public void onResult(List<Place> places) {
         Timber.d(String.valueOf(places.size()));
         addMarker(places);
+        this.places = places;
     }
 
     @Override
@@ -102,7 +112,7 @@ public class MapActivity extends BaseActivity implements PlaceViewInteractor,Goo
         googleMap.getUiSettings().setMapToolbarEnabled(false);
 
 
-        LatLng currentLocation = new LatLng(37.77,-122.42);
+        LatLng currentLocation = new LatLng(37.77, -122.42);
         CameraPosition cameraPosition = new CameraPosition.Builder().target(currentLocation).zoom(15).tilt(90).build();
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
@@ -113,6 +123,7 @@ public class MapActivity extends BaseActivity implements PlaceViewInteractor,Goo
 
     /**
      * Add marker for each place on map.
+     *
      * @param places
      */
     private void addMarker(List<Place> places) {
@@ -124,7 +135,7 @@ public class MapActivity extends BaseActivity implements PlaceViewInteractor,Goo
             Marker marker = googleMap.addMarker(new MarkerOptions()
                     .position(new LatLng(latitude, longitude))
                     .title(place.getName())
-                    .anchor(0,0.49f)
+                    .anchor(0, 0.49f)
                     .snippet(place.getAddress())
                     .icon(BitmapDescriptorFactory.fromBitmap(getBitmapIcon(place))));
             marker.setTag(place);
@@ -134,7 +145,7 @@ public class MapActivity extends BaseActivity implements PlaceViewInteractor,Goo
                 public boolean onMarkerClick(Marker marker) {
                     Bundle bundle = new Bundle();
                     bundle.putString("place", new Gson().toJson(marker.getTag()));
-                    startActivity(DetailActivity.class, bundle );
+                    startActivity(DetailActivity.class, bundle);
                     return true;
                 }
             });
@@ -153,11 +164,12 @@ public class MapActivity extends BaseActivity implements PlaceViewInteractor,Goo
 
     /**
      * Returns bitmap icon for place.
+     *
      * @param place
      * @return
      */
-    private Bitmap getBitmapIcon(Place place){
-        FrameLayout view = (FrameLayout)findViewById(R.id.framelayout);
+    private Bitmap getBitmapIcon(Place place) {
+        FrameLayout view = (FrameLayout) findViewById(R.id.framelayout);
         TextView textView = (TextView) view.findViewById(R.id.text_view);
         textView.setText(place.getName());
         view.setDrawingCacheEnabled(true);
@@ -189,8 +201,15 @@ public class MapActivity extends BaseActivity implements PlaceViewInteractor,Goo
         cameraLat = end.getLatitude();
         cameraLng = end.getLongitude();
 
-        presenter.getPlaces(String.valueOf(cameraLat + "," + cameraLng),"restaurant","500");
+        presenter.getPlaces(String.valueOf(cameraLat + "," + cameraLng), "restaurant", "500");
 
+    }
+
+    @OnClick(R.id.list)
+    public void onListView(View view) {
+        Bundle bundle =new Bundle();
+        bundle.putString("place", new Gson().toJson(places));
+        startActivity(ListActivity.class, bundle);
     }
 
     @Override

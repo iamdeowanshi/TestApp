@@ -18,6 +18,12 @@
         android:visibility="gone"
         android:id="@+id/progress"/>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ListView"
+        android:id="@+id/list"/>
+
     <FrameLayout
         android:id="@+id/framelayout"
         android:orientation="horizontal"
@@ -50,5 +56,6 @@
         </LinearLayout>
 
     </FrameLayout>
+
 
 </RelativeLayout>
